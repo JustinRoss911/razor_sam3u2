@@ -23,9 +23,9 @@ param([String]$debugfile = "");
 
 if ($debugfile -eq "")
 {
-& "C:\Program Files\IAR Systems\EWARM_8_10_1\common\bin\cspybat" -f "D:\EiE\EiE Git\razor_sam3u2\firmware_ascii\iar_8_10_1\settings\eie_ascii-01.Debug.general.xcl" --backend -f "D:\EiE\EiE Git\razor_sam3u2\firmware_ascii\iar_8_10_1\settings\eie_ascii-01.Debug.driver.xcl" 
+& "C:\Program Files\IAR Systems\EWARM_KS_8_10\common\bin\cspybat" -f "C:\github\razor_sam3u2_goodversion\firmware_ascii\iar_8_10_1\settings\eie_ascii-01.Debug.general.xcl" --backend -f "C:\github\razor_sam3u2_goodversion\firmware_ascii\iar_8_10_1\settings\eie_ascii-01.Debug.driver.xcl" 
 }
 else
 {
-& "C:\Program Files\IAR Systems\EWARM_8_10_1\common\bin\cspybat" -f "D:\EiE\EiE Git\razor_sam3u2\firmware_ascii\iar_8_10_1\settings\eie_ascii-01.Debug.general.xcl" --debug_file=$debugfile --backend -f "D:\EiE\EiE Git\razor_sam3u2\firmware_ascii\iar_8_10_1\settings\eie_ascii-01.Debug.driver.xcl" 
+& "C:\Program Files\IAR Systems\EWARM_KS_8_10\common\bin\cspybat" -f "C:\github\razor_sam3u2_goodversion\firmware_ascii\iar_8_10_1\settings\eie_ascii-01.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\github\razor_sam3u2_goodversion\firmware_ascii\iar_8_10_1\settings\eie_ascii-01.Debug.driver.xcl" 
 }

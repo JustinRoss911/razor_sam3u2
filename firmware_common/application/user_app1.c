@@ -92,6 +92,10 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
+  LedOn(CYAN);
+  LedOn(PURPLE);
+  LedOn(BLUE);
+  LedOn(WHITE);
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -140,7 +144,85 @@ State Machine Function Definitions
 /* What does this state do? */
 static void UserApp1SM_Idle(void)
 {
-    
+  static u16 u16BlinkCount = 0;
+  static u8 u8BinaryCounter = 0;
+  static bool Forward = TRUE;
+  static bool Reverse = FALSE;
+  u16BlinkCount++;
+  
+  if(u16BlinkCount == 75)
+  {
+    u16BlinkCount = 0;
+    u8BinaryCounter++;
+    if(u8BinaryCounter == 1 && Forward)
+    {
+      LedToggle(RED);
+      LedToggle(WHITE);
+    }
+    if(u8BinaryCounter == 2 && Forward)
+    {
+      LedToggle(ORANGE);
+      LedToggle(PURPLE);
+    }
+    if(u8BinaryCounter == 3 && Forward)
+    {
+      LedToggle(YELLOW);
+      LedToggle(CYAN);
+    }
+    if(u8BinaryCounter == 4 && Forward)
+    {
+      LedToggle(GREEN);
+      LedToggle(BLUE);
+      Forward = FALSE;
+      Reverse = TRUE;
+    }
+    if(u8BinaryCounter == 8 && Forward)
+    {
+      LedOff(RED);
+      LedOff(WHITE);
+      LedOff(ORANGE);
+      LedOff(PURPLE);
+      LedOff(YELLOW);
+      LedOff(CYAN);
+      LedOff(GREEN);
+      LedOff(BLUE);
+      u8BinaryCounter = 0;
+    }
+    if(u8BinaryCounter == 1 && Reverse)
+    {
+      LedToggle(GREEN);
+      LedToggle(BLUE);
+    }
+    if(u8BinaryCounter == 2 && Reverse)
+    {
+      LedToggle(YELLOW);
+      LedToggle(CYAN);
+    }
+    if(u8BinaryCounter == 3 && Reverse)
+    {
+      LedToggle(ORANGE);
+      LedToggle(PURPLE);
+    }
+    if(u8BinaryCounter == 4 && Reverse)
+    {
+      LedToggle(RED);
+      LedToggle(WHITE);
+      Forward = TRUE;
+      Reverse = FALSE;
+    }
+    if(u8BinaryCounter == 8 && Reverse)
+    {
+      LedOff(RED);
+      LedOff(WHITE);
+      LedOff(ORANGE);
+      LedOff(PURPLE);
+      LedOff(YELLOW);
+      LedOff(CYAN);
+      LedOff(GREEN);
+      LedOff(BLUE);
+      u8BinaryCounter = 0;
+    }
+  }
 } /* end UserApp1SM_Idle() */
      
 
