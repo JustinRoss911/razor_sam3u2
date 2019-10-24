@@ -92,10 +92,6 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
-  LedOn(CYAN);
-  LedOn(PURPLE);
-  LedOn(BLUE);
-  LedOn(WHITE);
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -150,7 +146,7 @@ static void UserApp1SM_Idle(void)
   static bool Reverse = FALSE;
   u16BlinkCount++;
   
-  if(u16BlinkCount == 75)
+  if(u16BlinkCount == 200)
   {
     u16BlinkCount = 0;
     u8BinaryCounter++;
@@ -167,16 +163,14 @@ static void UserApp1SM_Idle(void)
     if(u8BinaryCounter == 3 && Forward)
     {
       LedToggle(YELLOW);
-      LedToggle(CYAN);
+      LedToggle(BLUE);
     }
     if(u8BinaryCounter == 4 && Forward)
     {
       LedToggle(GREEN);
-      LedToggle(BLUE);
-      Forward = FALSE;
-      Reverse = TRUE;
+      LedToggle(CYAN);
     }
-    if(u8BinaryCounter == 8 && Forward)
+    if(u8BinaryCounter == 6 && Forward)
     {
       LedOff(RED);
       LedOff(WHITE);
@@ -186,17 +180,19 @@ static void UserApp1SM_Idle(void)
       LedOff(CYAN);
       LedOff(GREEN);
       LedOff(BLUE);
+      Forward = FALSE;
+      Reverse = TRUE;
       u8BinaryCounter = 0;
     }
     if(u8BinaryCounter == 1 && Reverse)
     {
       LedToggle(GREEN);
-      LedToggle(BLUE);
+      LedToggle(CYAN);
     }
     if(u8BinaryCounter == 2 && Reverse)
     {
       LedToggle(YELLOW);
-      LedToggle(CYAN);
+      LedToggle(BLUE);
     }
     if(u8BinaryCounter == 3 && Reverse)
     {
@@ -207,10 +203,8 @@ static void UserApp1SM_Idle(void)
     {
       LedToggle(RED);
       LedToggle(WHITE);
-      Forward = TRUE;
-      Reverse = FALSE;
     }
-    if(u8BinaryCounter == 8 && Reverse)
+    if(u8BinaryCounter == 6 && Reverse)
     {
       LedOff(RED);
       LedOff(WHITE);
@@ -220,6 +214,8 @@ static void UserApp1SM_Idle(void)
       LedOff(CYAN);
       LedOff(GREEN);
       LedOff(BLUE);
+      Forward = TRUE;
+      Reverse = FALSE;
       u8BinaryCounter = 0;
     }
   }
