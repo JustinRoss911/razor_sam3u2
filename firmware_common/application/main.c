@@ -88,6 +88,7 @@ void main(void)
 #endif /* EIE_DOTMATRIX */
  
   /* Application initialization */
+  //MyLedOperations1Initialize();
   UserApp1Initialize();
   UserApp2Initialize();
   UserApp3Initialize();
@@ -127,6 +128,7 @@ void main(void)
 #endif /* EIE_DOTMATRIX */
 
     /* Applications */
+    //MyLedOperations1RunActiveState();
     UserApp1RunActiveState();
     UserApp2RunActiveState();
     UserApp3RunActiveState();
