@@ -45,7 +45,7 @@ All Global variable names shall start with "G_<type>UserApp1"
 ***********************************************************************************************************************/
 /* New variables */
 volatile u32 G_u32UserApp1Flags;                          /*!< @brief Global state flags */
-
+bool bYellowBlink;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Existing variables (defined in other files -- should all contain the "extern" keyword) */
@@ -95,6 +95,15 @@ void UserApp1Initialize(void)
   /* If good initialization, set state to Idle */
   if( 1 )
   {
+    bYellowBlink = FALSE;
+    LedOff(WHITE);
+    LedOff(PURPLE);
+    LedOff(BLUE);
+    LedOff(CYAN);
+    LedOff(GREEN);
+    LedOff(YELLOW);
+    LedOff(ORANGE);
+    LedOff(RED);
     UserApp1_pfStateMachine = UserApp1SM_Idle;
   }
   else
@@ -140,7 +149,31 @@ State Machine Function Definitions
 /* What does this state do? */
 static void UserApp1SM_Idle(void)
 {
-    
+  /* BUTTON INTERFACE */
+  LedOn(RED);
+  if(IsButtonPressed(BUTTON0))
+  {
+    LedOn(WHITE);
+  }
+  else
+  {
+    LedOff(WHITE);
+  }
+  if(WasButtonPressed(BUTTON1))
+  {
+    ButtonAcknowledge(BUTTON1);
+    if(bYellowBlink)
+    {
+      bYellowBlink = FALSE;
+      LedOff(YELLOW);
+    }
+    else
+    {
+      bYellowBlink = TRUE;
+      LedBlink(YELLOW, LED_2HZ);
+    }
+  }
+  
 } /* end UserApp1SM_Idle() */
      
 
