@@ -45,7 +45,8 @@ All Global variable names shall start with "G_<type>UserApp1"
 ***********************************************************************************************************************/
 /* New variables */
 volatile u32 G_u32UserApp1Flags;                          /*!< @brief Global state flags */
-bool bYellowBlink;
+bool IdleIsTrue;
+bool Correct;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Existing variables (defined in other files -- should all contain the "extern" keyword) */
@@ -95,7 +96,7 @@ void UserApp1Initialize(void)
   /* If good initialization, set state to Idle */
   if( 1 )
   {
-    bYellowBlink = FALSE;
+    IdleIsTrue = TRUE;
     LedOff(WHITE);
     LedOff(PURPLE);
     LedOff(BLUE);
@@ -103,7 +104,7 @@ void UserApp1Initialize(void)
     LedOff(GREEN);
     LedOff(YELLOW);
     LedOff(ORANGE);
-    LedOff(RED);
+    LedOn(RED);
     UserApp1_pfStateMachine = UserApp1SM_Idle;
   }
   else
@@ -150,30 +151,59 @@ State Machine Function Definitions
 static void UserApp1SM_Idle(void)
 {
   /* BUTTON INTERFACE */
-  LedOn(RED);
-  if(IsButtonPressed(BUTTON0))
+  static int counter = 0;
+  static int CorrectCode = 0;
+  if((CorrectCode == 3)&&WasButtonPressed(BUTTON3))
   {
-    LedOn(WHITE);
+    ButtonAcknowledge(BUTTON3);
+    LedBlink(GREEN,LED_1HZ);
+    LedOff(ORANGE);
+    LedOff(RED);
   }
-  else
+  if((WasButtonPressed(BUTTON0)||WasButtonPressed(BUTTON1)||WasButtonPressed(BUTTON2))&&IdleIsTrue)
   {
-    LedOff(WHITE);
-  }
-  if(WasButtonPressed(BUTTON1))
-  {
+    ButtonAcknowledge(BUTTON0);
     ButtonAcknowledge(BUTTON1);
-    if(bYellowBlink)
+    LedOn(ORANGE);
+    IdleIsTrue = FALSE;
+    counter++;
+    if(WasButtonPressed(BUTTON2))
     {
-      bYellowBlink = FALSE;
-      LedOff(YELLOW);
+      ButtonAcknowledge(BUTTON2);
+      CorrectCode++;
+      Correct = TRUE;
     }
-    else
-    {
-      bYellowBlink = TRUE;
-      LedBlink(YELLOW, LED_2HZ);
-    }
+    Correct = FALSE;
   }
-  
+  if(WasButtonPressed(BUTTON0)&&Correct)
+  {
+    ButtonAcknowledge(BUTTON0);
+    CorrectCode++;
+    counter++;
+  }
+  if(WasButtonPressed(BUTTON0)&&Correct)
+  {
+    ButtonAcknowledge(BUTTON0);
+    CorrectCode++;
+    counter++;
+  }
+  if(WasButtonPressed(BUTTON0)||WasButtonPressed(BUTTON1)||WasButtonPressed(BUTTON2))
+  {
+    ButtonAcknowledge(BUTTON0);
+    ButtonAcknowledge(BUTTON1);
+    ButtonAcknowledge(BUTTON2);
+    Correct = FALSE;
+    counter++;
+  }
+  if(WasButtonPressed(BUTTON3)||counter == 10)
+  {
+    ButtonAcknowledge(BUTTON3);
+    IdleIsTrue = TRUE;
+    LedOff(ORANGE);
+    LedOn(RED);
+    counter = 0;
+    CorrectCode = 0;
+  }
 } /* end UserApp1SM_Idle() */
      
 
