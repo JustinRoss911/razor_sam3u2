@@ -47,6 +47,8 @@ All Global variable names shall start with "G_<type>UserApp1"
 volatile u32 G_u32UserApp1Flags;                          /*!< @brief Global state flags */
 bool IdleIsTrue;
 bool Correct;
+bool Correct1;
+bool Correct2;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Existing variables (defined in other files -- should all contain the "extern" keyword) */
@@ -96,6 +98,9 @@ void UserApp1Initialize(void)
   /* If good initialization, set state to Idle */
   if( 1 )
   {
+    Correct2 = FALSE;
+    Correct1 = FALSE;
+    Correct = FALSE;
     IdleIsTrue = TRUE;
     LedOff(WHITE);
     LedOff(PURPLE);
@@ -152,14 +157,14 @@ static void UserApp1SM_Idle(void)
 {
   /* BUTTON INTERFACE */
   static int counter = 0;
-  static int CorrectCode = 0;
-  if((CorrectCode == 3)&&WasButtonPressed(BUTTON3))
+  if(Correct&&WasButtonPressed(BUTTON3))
   {
     ButtonAcknowledge(BUTTON3);
     LedBlink(GREEN,LED_1HZ);
     LedOff(ORANGE);
     LedOff(RED);
   }
+  /*First Button Press*/
   if((WasButtonPressed(BUTTON0)||WasButtonPressed(BUTTON1)||WasButtonPressed(BUTTON2))&&IdleIsTrue)
   {
     ButtonAcknowledge(BUTTON0);
@@ -167,42 +172,49 @@ static void UserApp1SM_Idle(void)
     LedOn(ORANGE);
     IdleIsTrue = FALSE;
     counter++;
+    /*If First Button Press Is Correct Button*/
     if(WasButtonPressed(BUTTON2))
     {
       ButtonAcknowledge(BUTTON2);
-      CorrectCode++;
-      Correct = TRUE;
+      Correct1 = TRUE;
     }
     Correct = FALSE;
   }
-  if(WasButtonPressed(BUTTON0)&&Correct)
+  /*Second Correct Button Press*/
+  if(WasButtonPressed(BUTTON0)&&Correct1)
   {
     ButtonAcknowledge(BUTTON0);
-    CorrectCode++;
     counter++;
+    Correct1 = FALSE;
+    Correct2 = TRUE;
   }
-  if(WasButtonPressed(BUTTON0)&&Correct)
+  /*Third Correct Button Press*/
+  if(WasButtonPressed(BUTTON0)&&Correct2)
   {
     ButtonAcknowledge(BUTTON0);
-    CorrectCode++;
     counter++;
+    Correct2 = FALSE;
+    Correct = TRUE;
   }
+  /*If The Incorrect Sequence is Put in*/
   if(WasButtonPressed(BUTTON0)||WasButtonPressed(BUTTON1)||WasButtonPressed(BUTTON2))
   {
     ButtonAcknowledge(BUTTON0);
     ButtonAcknowledge(BUTTON1);
     ButtonAcknowledge(BUTTON2);
     Correct = FALSE;
+    Correct1 = FALSE;
+    Correct2 = FALSE;
     counter++;
   }
-  if(WasButtonPressed(BUTTON3)||counter == 10)
+  /*Enter Button*/
+  if(WasButtonPressed(BUTTON3)||counter > 10)
   {
     ButtonAcknowledge(BUTTON3);
     IdleIsTrue = TRUE;
     LedOff(ORANGE);
     LedOn(RED);
     counter = 0;
-    CorrectCode = 0;
   }
 } /* end UserApp1SM_Idle() */
      
