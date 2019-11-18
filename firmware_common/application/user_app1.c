@@ -98,10 +98,10 @@ void UserApp1Initialize(void)
   /* If good initialization, set state to Idle */
   if( 1 )
   {
-    Correct2 = FALSE;
-    Correct1 = FALSE;
-    Correct = FALSE;
-    IdleIsTrue = TRUE;
+    Correct2 = FALSE; /*Correst2 is basically the switch from correct button press 2 to 3*/
+    Correct1 = FALSE; /*Correct1 is basically the switch from correct button press 1 to button 2*/
+    Correct = FALSE; /*If Correct is TRUE than the correct sequence has been entered (this can only occur if Correct2 is TRUE)*/
+    IdleIsTrue = TRUE;/*This is a swtich in the system to differ from being in an idle state, and having a sequence being inputed by the user*/
     LedOff(WHITE);
     LedOff(PURPLE);
     LedOff(BLUE);
@@ -169,7 +169,7 @@ static void UserApp1SM_Idle(void)
   {
     ButtonAcknowledge(BUTTON0);
     ButtonAcknowledge(BUTTON1);
-    LedOn(ORANGE);
+    LedOn(ORANGE); /*Orange LED is for showing that the user has a sequence being inputed (it is out of idle state)*/
     IdleIsTrue = FALSE;
     counter++;
     /*If First Button Press Is Correct Button*/
@@ -202,12 +202,12 @@ static void UserApp1SM_Idle(void)
     ButtonAcknowledge(BUTTON0);
     ButtonAcknowledge(BUTTON1);
     ButtonAcknowledge(BUTTON2);
+    counter++;
     Correct = FALSE;
     Correct1 = FALSE;
     Correct2 = FALSE;
-    counter++;
   }
-  /*Enter Button*/
+  /*Enter Button or Password entered is to many digits*/
   if(WasButtonPressed(BUTTON3)||counter > 10)
   {
     ButtonAcknowledge(BUTTON3);
