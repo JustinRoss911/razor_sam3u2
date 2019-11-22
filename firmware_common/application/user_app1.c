@@ -45,10 +45,9 @@ All Global variable names shall start with "G_<type>UserApp1"
 ***********************************************************************************************************************/
 /* New variables */
 volatile u32 G_u32UserApp1Flags;                          /*!< @brief Global state flags */
-bool IdleIsTrue;
-bool Correct;
-bool Correct1;
-bool Correct2;
+static ButtonNameType Password[MAX_PASS_LENGTH] = {NOBUTTON, NOBUTTON, NOBUTTON, NOBUTTON, NOBUTTON, NOBUTTON, NOBUTTON, NOBUTTON, NOBUTTON, NOBUTTON};
+static bool CorrectPassword;
+static u32 u32PasswordCount = 0;
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Existing variables (defined in other files -- should all contain the "extern" keyword) */
@@ -73,7 +72,37 @@ Function Definitions
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*! @publicsection */                                                                                            
 /*--------------------------------------------------------------------------------------------------------------------*/
-
+/* 
+@fn ButtonNameType CheckButtonPressed 
+@brief
+This function is used to return the button that is pressed.
+*/
+ButtonNameType CheckButtonPressed(void)
+{
+  ButtonNameType TheButton = NOBUTTON;
+  if(WasButtonPressed(BUTTON0))
+  {
+    ButtonAcknowledge(BUTTON0);
+    TheButton = BUTTON0;
+  }
+  if(WasButtonPressed(BUTTON1))
+  {
+    ButtonAcknowledge(BUTTON1);
+    TheButton = BUTTON1;
+  }
+  if(WasButtonPressed(BUTTON2))
+  {
+    ButtonAcknowledge(BUTTON2);
+    TheButton = BUTTON2;
+  }
+  if(WasButtonPressed(BUTTON3))
+  {
+    ButtonAcknowledge(BUTTON3);
+    TheButton = BUTTON3;
+  }
+  return TheButton;
+}
+/* End of CheckButtonPressed */
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*! @protectedsection */                                                                                            
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -98,19 +127,16 @@ void UserApp1Initialize(void)
   /* If good initialization, set state to Idle */
   if( 1 )
   {
-    Correct2 = FALSE; /*Correst2 is basically the switch from correct button press 2 to 3*/
-    Correct1 = FALSE; /*Correct1 is basically the switch from correct button press 1 to button 2*/
-    Correct = FALSE; /*If Correct is TRUE than the correct sequence has been entered (this can only occur if Correct2 is TRUE)*/
-    IdleIsTrue = TRUE;/*This is a swtich in the system to differ from being in an idle state, and having a sequence being inputed by the user*/
     LedOff(WHITE);
     LedOff(PURPLE);
     LedOff(BLUE);
     LedOff(CYAN);
-    LedOff(GREEN);
     LedOff(YELLOW);
     LedOff(ORANGE);
-    LedOn(RED);
-    UserApp1_pfStateMachine = UserApp1SM_Idle;
+    LedBlink(RED, LED_1HZ);
+    LedBlink(GREEN, LED_1HZ);
+    CorrectPassword = TRUE;
+    UserApp1_pfStateMachine = UserApp1SM_SetPass;
   }
   else
   {
@@ -152,71 +178,101 @@ void UserApp1RunActiveState(void)
 State Machine Function Definitions
 **********************************************************************************************************************/
 /*-------------------------------------------------------------------------------------------------------------------*/
-/* What does this state do? */
+/* This State is for the user to enter their Password // PASSWORD ENTER STATE*/
+static void UserApp1SM_SetPass(void)
+{
+  ButtonNameType RecentButtonPress = CheckButtonPressed();
+  if(RecentButtonPress == BUTTON0)
+  {
+    Password[u32PasswordCount] = BUTTON0;
+    u32PasswordCount++;
+  }
+  if(RecentButtonPress == BUTTON1)
+  {
+    Password[u32PasswordCount] = BUTTON1;
+    u32PasswordCount++;
+  }
+  if(RecentButtonPress == BUTTON2)
+  {
+    Password[u32PasswordCount] = BUTTON2;
+    u32PasswordCount++;
+  }
+  if(RecentButtonPress == BUTTON3)
+  {
+    UserApp1_pfStateMachine = UserApp1SM_Idle;
+    LedOff(RED);
+    LedOff(GREEN);
+  }
+} /* End of SetPass */
+
+/* This state is for entering the password // INPUT STATE */
 static void UserApp1SM_Idle(void)
 {
-  /* BUTTON INTERFACE */
-  static int counter = 0;
-  if(Correct&&WasButtonPressed(BUTTON3))
+  LedOn(RED);
+  static u32 u32ButtonPressedCount = 0;
+  ButtonNameType RecentButtonPress = CheckButtonPressed();
+  if(RecentButtonPress != NOBUTTON)
   {
-    ButtonAcknowledge(BUTTON3);
-    LedBlink(GREEN,LED_1HZ);
-    LedOff(ORANGE);
-    LedOff(RED);
-  }
-  /*First Button Press*/
-  if((WasButtonPressed(BUTTON0)||WasButtonPressed(BUTTON1)||WasButtonPressed(BUTTON2))&&IdleIsTrue)
-  {
-    ButtonAcknowledge(BUTTON0);
-    ButtonAcknowledge(BUTTON1);
-    LedOn(ORANGE); /*Orange LED is for showing that the user has a sequence being inputed (it is out of idle state)*/
-    IdleIsTrue = FALSE;
-    counter++;
-    /*If First Button Press Is Correct Button*/
-    if(WasButtonPressed(BUTTON2))
+    if(RecentButtonPress != BUTTON3)
     {
-      ButtonAcknowledge(BUTTON2);
-      Correct1 = TRUE;
+      if(RecentButtonPress != Password[u32ButtonPressedCount])
+      {
+        LedOn(BLUE);
+        CorrectPassword = FALSE;
+        u32ButtonPressedCount++;
+      }
+      if(RecentButtonPress == Password[u32ButtonPressedCount])
+      {
+        LedOn(BLUE);
+        u32ButtonPressedCount++;
+      }
     }
-    Correct = FALSE;
-  }
-  /*Second Correct Button Press*/
-  if(WasButtonPressed(BUTTON0)&&Correct1)
-  {
-    ButtonAcknowledge(BUTTON0);
-    counter++;
-    Correct1 = FALSE;
-    Correct2 = TRUE;
-  }
-  /*Third Correct Button Press*/
-  if(WasButtonPressed(BUTTON0)&&Correct2)
-  {
-    ButtonAcknowledge(BUTTON0);
-    counter++;
-    Correct2 = FALSE;
-    Correct = TRUE;
-  }
-  /*If The Incorrect Sequence is Put in*/
-  if(WasButtonPressed(BUTTON0)||WasButtonPressed(BUTTON1)||WasButtonPressed(BUTTON2))
-  {
-    ButtonAcknowledge(BUTTON0);
-    ButtonAcknowledge(BUTTON1);
-    ButtonAcknowledge(BUTTON2);
-    counter++;
-    Correct = FALSE;
-    Correct1 = FALSE;
-    Correct2 = FALSE;
-  }
-  /*Enter Button or Password entered is to many digits*/
-  if(WasButtonPressed(BUTTON3)||counter > 10)
-  {
-    ButtonAcknowledge(BUTTON3);
-    IdleIsTrue = TRUE;
-    LedOff(ORANGE);
-    LedOn(RED);
-    counter = 0;
+    if(RecentButtonPress == BUTTON3 && CorrectPassword && u32ButtonPressedCount == u32PasswordCount)
+    {
+      LedOff(RED);
+      LedOff(BLUE);
+      LedBlink(GREEN, LED_2HZ);
+      u32ButtonPressedCount = 0;
+      UserApp1_pfStateMachine = UserApp1SM_Correct;
+    }
+    if((RecentButtonPress == BUTTON3 && !CorrectPassword) || u32ButtonPressedCount > 10)
+    {
+      LedOff(RED);
+      LedOff(BLUE);
+      LedBlink(RED, LED_2HZ);
+      u32ButtonPressedCount = 0;
+      UserApp1_pfStateMachine = UserApp1SM_Incorrect;
+    }
   }
 } /* end UserApp1SM_Idle() */
+
+/* CORRECT PASSWORD STATE // This state is a counter to show that the password was inputed correctly */
+static void UserApp1SM_Correct(void)
+{
+  static u32 u32CorrectCounter = 0;
+  u32CorrectCounter++;
+  if(u32CorrectCounter == 5000)
+  {
+    LedOff(GREEN);
+    UserApp1_pfStateMachine = UserApp1SM_Idle;
+    u32CorrectCounter = 0;
+    CorrectPassword = TRUE;
+  }
+} /* end UserApp1SM_Correct() */
+
+/* INCORRECT PASSWORD STATE // This state is a counter to show that the password was inputed incorrectly */
+static void UserApp1SM_Incorrect(void)
+{
+  static u32 u32IncorrectCounter = 0;
+  u32IncorrectCounter++;
+  if(u32IncorrectCounter == 5000)
+  {
+    LedOff(RED);
+    UserApp1_pfStateMachine = UserApp1SM_Idle;
+    u32IncorrectCounter = 0;
+    CorrectPassword = TRUE;
+  }
+} /* end UserApp1SM_Correct() */
      
 
 /*-------------------------------------------------------------------------------------------------------------------*/

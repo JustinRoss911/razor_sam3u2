@@ -30,7 +30,7 @@ Function Declarations
 /*------------------------------------------------------------------------------------------------------------------*/
 /*! @publicsection */                                                                                            
 /*--------------------------------------------------------------------------------------------------------------------*/
-
+ButtonNameType CheckButtonPressed(void);
 
 /*------------------------------------------------------------------------------------------------------------------*/
 /*! @protectedsection */                                                                                            
@@ -48,14 +48,17 @@ void UserApp1RunActiveState(void);
 State Machine Declarations
 ***********************************************************************************************************************/
 static void UserApp1SM_Idle(void);    
-static void UserApp1SM_Error(void);         
+static void UserApp1SM_Error(void);
+static void UserApp1SM_SetPass(void);
+static void UserApp1SM_Correct(void);
+static void UserApp1SM_Incorrect(void);
 
 
 
 /**********************************************************************************************************************
 Constants / Definitions
 **********************************************************************************************************************/
-
+#define MAX_PASS_LENGTH (10U)
 
 #endif /* __USER_APP1_H */
 
