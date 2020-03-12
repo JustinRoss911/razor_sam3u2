@@ -88,9 +88,7 @@ void main(void)
 #endif /* EIE_DOTMATRIX */
  
   /* Application initialization */
-  UserApp1Initialize();
-  UserApp2Initialize();
-  UserApp3Initialize();
+  StudentBoardInitialize();
 
   /* Exit initialization */
   SystemStatusReport();
@@ -127,9 +125,7 @@ void main(void)
 #endif /* EIE_DOTMATRIX */
 
     /* Applications */
-    UserApp1RunActiveState();
-    UserApp2RunActiveState();
-    UserApp3RunActiveState();
+    StudentBoardRunActiveState();
         
     /* System sleep */
     HEARTBEAT_OFF();
